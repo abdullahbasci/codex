@@ -24,4 +24,6 @@ python word_learning_app.py words.xlsx
 
 A window will appear displaying the English word and its example sentence. Use the buttons to reveal the translation and mark the word as learned, to repeat later or not learned. A drop-down menu lets you choose to study all words or only those that are learned, need repeating or not yet learned. You can view the lists of words in each category with **Listeleri Göster** and the progress bar shows counts for each group as well as the overall percentage learned.
 
+The interface now uses a light background and colour-coded buttons to make the study session more pleasant.
+
 All words start in the *not learned* state. Selecting **Öğrendim** moves it to the learned group, **Tekrar et** moves it to the repeat group, and **Öğrenmedim** keeps it in the not learned group. When all words are marked as learned the application notifies you and exits.
