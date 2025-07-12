@@ -1,7 +1,6 @@
 import pandas as pd
 import tkinter as tk
 from tkinter import messagebox
-import random
 import argparse
 
 
@@ -30,6 +29,21 @@ class WordLearningApp:
         self.translation_label = tk.Label(self.root, text="", fg="blue", wraplength=400, justify="center")
         self.translation_label.pack(pady=10)
 
+        # Progress and filtering
+        self.filter_var = tk.StringVar(value="All")
+        filter_frame = tk.Frame(self.root)
+        filter_frame.pack(pady=5)
+        tk.Label(filter_frame, text="Çalışma Modu:").pack(side="left")
+        options = ["All", "learned", "repeat", "not_learned"]
+        self.filter_menu = tk.OptionMenu(filter_frame, self.filter_var, *options, command=lambda _: self.next_word())
+        self.filter_menu.pack(side="left")
+
+        self.list_button = tk.Button(filter_frame, text="Listeleri Göster", command=self.show_lists)
+        self.list_button.pack(side="left", padx=5)
+
+        self.progress_label = tk.Label(self.root, text="")
+        self.progress_label.pack(pady=5)
+
         button_frame = tk.Frame(self.root)
         button_frame.pack(pady=10)
 
@@ -47,21 +61,34 @@ class WordLearningApp:
 
         self.next_word()
 
-    def pending_words(self):
-        """Return DataFrame of words that are not yet learned."""
-        return self.df[self.df['Status'] != 'learned']
+    def filtered_words(self):
+        """Return DataFrame filtered according to the selected study mode."""
+        mode = self.filter_var.get()
+        if mode == "All":
+            return self.df
+        return self.df[self.df['Status'] == mode]
 
     def next_word(self):
-        pending = self.pending_words()
-        if pending.empty:
-            messagebox.showinfo("Congratulations", "Tüm kelimeleri öğrendiniz!")
-            self.root.quit()
+        words = self.filtered_words()
+        if words.empty:
+            messagebox.showinfo("Bilgi", "Seçilen kategoride kelime yok")
             return
-        row = pending.sample().iloc[0]
+        row = words.sample().iloc[0]
         self.current_index = row.name
         self.word_label.config(text=row['English'])
         self.sentence_label.config(text=row['Example Sentence'])
         self.translation_label.config(text="")
+        self.update_progress()
+
+    def update_progress(self):
+        learned = (self.df['Status'] == 'learned').sum()
+        repeat = (self.df['Status'] == 'repeat').sum()
+        not_learned = (self.df['Status'] == 'not_learned').sum()
+        total = len(self.df)
+        percent = (learned / total * 100) if total else 0
+        self.progress_label.config(
+            text=f"Öğrenilen: {learned}  Tekrar: {repeat}  Öğrenilmedi: {not_learned}  (%{percent:.1f} öğrenildi)"
+        )
 
     def show_translation(self):
         turkish = self.df.loc[self.current_index, 'Turkish']
@@ -81,6 +108,19 @@ class WordLearningApp:
 
     def run(self):
         self.root.mainloop()
+
+    def show_lists(self):
+        top = tk.Toplevel(self.root)
+        top.title("Kelime Listeleri")
+        statuses = [("learned", "Öğrenilenler"), ("repeat", "Tekrar"), ("not_learned", "Öğrenilmedi")]
+        for status, title in statuses:
+            frame = tk.Frame(top)
+            frame.pack(side="left", padx=5, pady=5, fill="both", expand=True)
+            tk.Label(frame, text=title).pack()
+            listbox = tk.Listbox(frame, width=25)
+            listbox.pack(fill="both", expand=True)
+            for word in self.df[self.df['Status'] == status]['English']:
+                listbox.insert("end", word)
 
 
 def main():
