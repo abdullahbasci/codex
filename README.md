@@ -1,1 +1,29 @@
-# codex
+# Word Learning Application
+
+This repository contains a simple Tkinter application for practising English vocabulary using an Excel file. The Excel file must contain the following columns:
+
+- **English** – the word to learn
+- **Turkish** – its translation
+- **Example Sentence** – a sample usage of the word
+
+## Usage
+
+1. Prepare an Excel file with the required columns (an `.xlsx` file). Place it somewhere accessible.
+2. Install the dependencies:
+
+```bash
+pip install pandas openpyxl
+```
+
+3. Run the application and pass the path to your Excel file:
+
+```bash
+python word_learning_app.py words.xlsx
+```
+
+
+A window will appear displaying the English word and its example sentence. Use the buttons to reveal the translation and mark the word as learned, to repeat later, or not learned. The drop-down menu filters by learning state and **Listeleri Göster** opens the lists of words in each category. The progress bar and stats label keep track of how many words you have learned.
+
+The interface follows a minimalist design: a pastel background surrounds a white panel with rounded edges and a subtle shadow. Text uses a clean sans‑serif font and generous spacing. Buttons are colour‑coded (blue for translation, green for learned, yellow for repeat, red for not learned) with rounded corners and hover effects. A small progress bar sits below the stats label to visualise the percentage learned.
+
+All words start in the *not learned* state. Selecting **Öğrendim** moves it to the learned group, **Tekrar et** moves it to the repeat group, and **Öğrenmedim** keeps it in the not learned group. When all words are marked as learned the application notifies you and exits.
